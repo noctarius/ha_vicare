@@ -1,16 +1,16 @@
 {
   "domain": "vicare",
   "name": "Viessmann ViCare",
-  "documentation": "https://www.home-assistant.io/integrations/vicare",
   "codeowners": ["@oischinger"],
   "requirements": ["git+https://github.com/noctarius/PyViCare.git#PyViCare==2.22.0"],
-  "iot_class": "cloud_polling",
   "config_flow": true,
-  "version": "2.0.0",
   "dhcp": [
     {
       "macaddress": "B87424*"
     }
   ],
-  "loggers": ["PyViCare"]
+  "documentation": "https://www.home-assistant.io/integrations/vicare",
+  "iot_class": "cloud_polling",
+  "loggers": ["PyViCare"],
+  "version": "2.0.0"
 }
