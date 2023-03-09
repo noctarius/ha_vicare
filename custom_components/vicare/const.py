@@ -25,6 +25,7 @@ DEFAULT_SCAN_INTERVAL = 60
 
 VICARE_CUBIC_METER = "cubicMeter"
 VICARE_KWH = "kilowattHour"
+VICARE_WATT = "watt"
 
 VICARE_UNIT_TO_DEVICE_CLASS = {
     VICARE_KWH: SensorDeviceClass.ENERGY,
