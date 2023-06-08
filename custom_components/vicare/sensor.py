@@ -8,6 +8,7 @@ import logging
 
 from PyViCare.PyViCareDevice import Device
 from PyViCare.PyViCareUtils import (
+    PyViCareInternalServerError,
     PyViCareInvalidDataError,
     PyViCareNotSupportedFeatureError,
     PyViCareRateLimitError,
@@ -36,14 +37,20 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from . import ViCareRequiredKeysMixin
 from .const import (
     DOMAIN,
+    VICARE_CUBIC_METER,
     VICARE_DEVICE_CONFIG,
+    VICARE_KWH,
     VICARE_NAME,
-    VICARE_UNIT_TO_DEVICE_CLASS,
     VICARE_UNIT_TO_UNIT_OF_MEASUREMENT,
 )
 from .helpers import get_device_name, get_unique_device_id, get_unique_id
 
 _LOGGER = logging.getLogger(__name__)
+
+VICARE_UNIT_TO_DEVICE_CLASS = {
+    VICARE_KWH: SensorDeviceClass.ENERGY,
+    VICARE_CUBIC_METER: SensorDeviceClass.GAS,
+}
 
 
 @dataclass
@@ -54,22 +61,6 @@ class ViCareSensorEntityDescription(SensorEntityDescription, ViCareRequiredKeysM
 
 
 GLOBAL_SENSORS: tuple[ViCareSensorEntityDescription, ...] = (
-    ViCareSensorEntityDescription(
-        key="temperature",
-        name="Temperature",
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        value_getter=lambda api: api.getTemperature(),
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-    ),
-    ViCareSensorEntityDescription(
-        key="humidity",
-        name="Humidity",
-        icon="mdi:percent",
-        native_unit_of_measurement=PERCENTAGE,
-        value_getter=lambda api: api.getHumidity(),
-        state_class=SensorStateClass.MEASUREMENT,
-    ),
     ViCareSensorEntityDescription(
         key="outside_temperature",
         name="Outside Temperature",
@@ -487,6 +478,22 @@ GLOBAL_SENSORS: tuple[ViCareSensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
+    ViCareSensorEntityDescription(
+        key="room_temperature",
+        name="Room Temperature",
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        value_getter=lambda api: api.getTemperature(),
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
+    ViCareSensorEntityDescription(
+        key="room_humidity",
+        name="Room Humidity",
+        icon="mdi:percent",
+        native_unit_of_measurement=PERCENTAGE,
+        value_getter=lambda api: api.getHumidity(),
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
 )
 
 CIRCUIT_SENSORS: tuple[ViCareSensorEntityDescription, ...] = (
@@ -654,6 +661,11 @@ def _build_entity(name, vicare_api, device_config, sensor):
     try:
         sensor.value_getter(vicare_api)
         _LOGGER.debug("Found entity %s", name)
+    except PyViCareInternalServerError as server_error:
+        _LOGGER.info(
+            "Server error ( %s): Not creating entity %s", server_error.message, name
+        )
+        return None
     except PyViCareNotSupportedFeatureError:
         _LOGGER.info("Feature not supported %s", name)
         return None
@@ -761,7 +773,7 @@ class ViCareSensor(SensorEntity):
         self._attr_name = name
         self._api = api
         self._device_config = device_config
-        self._state = None
+        self.update()
 
     @property
     def device_info(self) -> DeviceInfo:

@@ -1,3 +1,2 @@
-#PyViCare >= 2.21.0
-git+https://github.com/noctarius/PyViCare@vitocal-200s-paid#egg=PyViCare
-homeassistant==2021.12.10
+PyViCare >= 2.25.0
+homeassistant >= 2023.4.1
