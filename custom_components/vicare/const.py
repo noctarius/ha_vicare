@@ -25,6 +25,7 @@ CONF_PREMIUM = "subscription_premium"
 
 VICARE_CUBIC_METER = "cubicMeter"
 VICARE_KWH = "kilowattHour"
+VICARE_WATT = "watt"
 
 VICARE_UNIT_TO_UNIT_OF_MEASUREMENT = {
     VICARE_KWH: UnitOfEnergy.KILO_WATT_HOUR,

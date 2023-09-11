@@ -596,6 +596,86 @@ COMPRESSOR_SENSORS: tuple[ViCareSensorEntityDescription, ...] = (
         value_getter=lambda api: api.getHoursLoadClass5(),
         state_class=SensorStateClass.TOTAL_INCREASING,
     ),
+    ViCareSensorEntityDescription(
+        key="boiler_temperature_commonsupply",
+        name="Heating Boiler Temperature Common Supply",
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        value_getter=lambda api: api.getBoilerTemperatureCommonSupply(),
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
+    ViCareSensorEntityDescription(
+        key="compressor_production_cooling_week",
+        name="Compressor Production Cooling Week",
+        icon="mdi:counter",
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        value_getter=lambda api: api.getProductionCoolingWeek(),
+        state_class=SensorStateClass.TOTAL_INCREASING,
+    ),
+    ViCareSensorEntityDescription(
+        key="compressor_production_week",
+        name="Compressor Production Week",
+        icon="mdi:counter",
+        native_unit_of_measurement=UnitOfPower.WATT,
+        value_getter=lambda api: api.getProductionCurrent(),
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
+    ViCareSensorEntityDescription(
+        key="compressor_production_current",
+        name="Compressor Production Current",
+        icon="mdi:counter",
+        native_unit_of_measurement=UnitOfPower.WATT,
+        value_getter=lambda api: api.getProductionCoolingWeek(),
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
+    ViCareSensorEntityDescription(
+        key="compressor_production_dhw_week",
+        name="Compressor Production Domestic Hot Water Week",
+        icon="mdi:counter",
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        value_getter=lambda api: api.getProductionDomesticHotWaterWeek(),
+        state_class=SensorStateClass.TOTAL_INCREASING,
+    ),
+    ViCareSensorEntityDescription(
+        key="compressor_production_heating_week",
+        name="Compressor Production Heating Week",
+        icon="mdi:counter",
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        value_getter=lambda api: api.getProductionHeatingWeek(),
+        state_class=SensorStateClass.TOTAL_INCREASING,
+    ),
+    ViCareSensorEntityDescription(
+        key="compressor_consumption_cooling_week",
+        name="Compressor Consumption Cooling Week",
+        icon="mdi:counter",
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        value_getter=lambda api: api.getConsumptionCoolingWeek(),
+        state_class=SensorStateClass.TOTAL_INCREASING,
+    ),
+    ViCareSensorEntityDescription(
+        key="compressor_consumption_current",
+        name="Compressor Consumption Current",
+        icon="mdi:counter",
+        native_unit_of_measurement=UnitOfPower.WATT,
+        value_getter=lambda api: api.getConsumptionCurrent(),
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
+    ViCareSensorEntityDescription(
+        key="compressor_consumption_dhw_week",
+        name="Compressor Consumption Domestic Hot Water Week",
+        icon="mdi:counter",
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        value_getter=lambda api: api.getConsumptionDomesticHotWaterWeek(),
+        state_class=SensorStateClass.TOTAL_INCREASING,
+    ),
+    ViCareSensorEntityDescription(
+        key="compressor_consumption_heating_week",
+        name="Compressor Consumption Heating Week",
+        icon="mdi:counter",
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        value_getter=lambda api: api.getConsumptionHeatingWeek(),
+        state_class=SensorStateClass.TOTAL_INCREASING,
+    ),
 )
 
 
@@ -612,8 +692,8 @@ def _build_entity(name, vicare_api, device_config, sensor):
     except PyViCareNotSupportedFeatureError:
         _LOGGER.info("Feature not supported %s", name)
         return None
-    except AttributeError:
-        _LOGGER.debug("Attribute Error %s", name)
+    except AttributeError as attribute_error:
+        _LOGGER.debug("Attribute Error %s: %s", name, attribute_error)
         return None
 
     return ViCareSensor(
